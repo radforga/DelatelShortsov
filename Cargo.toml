@@ -1,0 +1,9 @@
+[package]
+name = "ShortsDealer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]  
+ffmpeg-next = { version = "7.1.0", features = ["static", "build"] }
+yt-dlp = "2.8.3"
+tokio = { version = "1", features = ["full"] }
