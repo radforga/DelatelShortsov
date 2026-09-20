@@ -14,7 +14,7 @@ impl YoutubeDownLoader{
     }
 
 
-    pub async fn download_vid(&self, url:String) -> Result<(), Box<dyn std::error::Error>>{
+    pub async fn download_vid(&self, url:String) -> Result<PathBuf, Box<dyn std::error::Error>>{
            let libraries_dir = PathBuf::from("libs");
     let output_dir = PathBuf::from("output");
     
@@ -29,6 +29,6 @@ impl YoutubeDownLoader{
         
         let video = downloader.fetch_video_infos(url).await?;
         let video_path = downloader.download_video(&video, "test-vid.mp4").await?;
-        Ok(())
+        Ok(video_path)
     }
 }

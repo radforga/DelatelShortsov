@@ -17,6 +17,9 @@ impl Job{
     pub fn edit_source_url(&mut self,url : String){
         self.source = VideoSource::Url(url);   
     }
+    pub fn edit_source_path(&mut self, path : PathBuf){
+        self.source =VideoSource::File(path);
+    }
 
 }
 
