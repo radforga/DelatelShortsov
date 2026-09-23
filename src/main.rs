@@ -1,11 +1,18 @@
 use std::io;
+use std::path::PathBuf;
 
 mod downloader;
 mod pipeline;
+mod editer;
+
+
+
+
 
 use crate::pipeline::Job;
 use crate::downloader::YoutubeDownLoader;
 use crate::pipeline::Pipeline;
+use crate::editer::Decoder;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -17,8 +24,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     job.edit_source_url(url);
     println!("Запуск скачивания...");
     
-    pipeline.run(job).await;
+    pipeline.run(&mut job).await;
     
     println!("Скачивание успешно завершено.");
-    Ok(())
+    println!("Декодирование");
+
+    let mut decoder = match &job.source {
+                              pipeline::job::VideoSource::File(file) => {
+                                  Decoder::new(file.clone()) }
+
+                            pipeline::job::VideoSource::Url(url) =>{
+                                Decoder::new(PathBuf::from(url))
+                            }
+                      };
+
+    while let Some(frame)= decoder.next_frame() {
+        println!(
+            "frame: {}x{}, pts: {:?}",
+            frame.width(),
+            frame.height(),
+            frame.pts()
+            );
+    }
+        Ok(())
 }

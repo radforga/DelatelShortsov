@@ -11,7 +11,7 @@ impl Pipeline{
         pub fn new() -> Self{
             Self { downloader: YoutubeDownLoader::new() }
         }
-        pub async  fn run(&self,mut job: Job){
+        pub async  fn run(&self,mut job: &mut Job){
  
             let video_path= match &job.source{
                 VideoSource::Url(url) => {
