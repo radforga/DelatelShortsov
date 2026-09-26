@@ -1,4 +1,4 @@
-use std::{any::TypeId, path::PathBuf};
+use std::{any::TypeId, path::PathBuf, time::Duration};
 
 use ffmpeg_next;
 
@@ -10,20 +10,22 @@ pub struct Decoder {
     video_stream_index: usize,
     packet: ffmpeg_next::Packet,
     frame: ffmpeg_next::frame::Video,
+    pub time_base: ffmpeg_next::Rational,
 }
 
 impl Decoder{
     pub fn new(path : PathBuf)->Self{
      ffmpeg_next::init().unwrap();
         let mut input = ffmpeg_next::format::input(&path).unwrap();
-        let (video_stream_index, video_decoder) ={
+        let (video_stream_index, video_decoder, time_base) ={
         let video_stream = input.streams().best(ffmpeg_next::media::Type::Video).unwrap();
         let context = ffmpeg_next::codec::context::Context::from_parameters(video_stream.parameters()).unwrap();
                 let video_stream_index = video_stream.index();
                 let video_decoder = context.decoder().video().unwrap();
-                (video_stream_index, video_decoder)
+                let time_base = video_stream.time_base();
+                (video_stream_index, video_decoder, time_base)
         };
-        Self { input, video_decoder, video_stream_index, packet: ffmpeg_next::Packet::empty(), frame: ffmpeg_next::frame::Video::empty() }
+        Self { input, video_decoder, video_stream_index, packet: ffmpeg_next::Packet::empty(), frame: ffmpeg_next::frame::Video::empty(), time_base }
     }
     pub fn next_frame(&mut self) -> Option<&ffmpeg_next::frame::Video>{
            loop {
@@ -43,4 +45,5 @@ impl Decoder{
         }
 
     }
+   
 }
